@@ -5,7 +5,7 @@ import frames.processing.*;
 // 1. Frames' objects
 Scene scene;
 Frame frame;
-Vector v1, v2, v3;
+Vector v1, v2, v3, p;
 // timing
 TimingTask spinningTask;
 boolean yDirection;
@@ -22,7 +22,7 @@ String renderer = P3D;
 
 void setup() {
   //use 2^n to change the dimensions
-  size(1024, 1024, renderer);
+  size(512, 512, renderer);
   scene = new Scene(this);
   if (scene.is3D())
     scene.setType(Scene.Type.ORTHOGRAPHIC);
@@ -71,14 +71,43 @@ void draw() {
 // Implement this function to rasterize the triangle.
 // Coordinates are given in the frame system which has a dimension of 2^n
 void triangleRaster() {
+  pushStyle();
+  //stroke(255, 255, 0);
+  
+  strokeWeight(0.1);
+  for(int row=height/2; row>-height/2; row--){
+    for(int col=-width/2; col<width/2; col++){
+      p = new Vector(row, col);
+      if((v1.y()-v2.y())*p.x()+
+         (v2.x()-v1.x())*p.y()+
+         (v1.x()*v2.y()-v1.y()*v2.x())>0
+         &&
+         (v2.y()-v3.y())*p.x()+
+         (v3.x()-v2.x())*p.y()+
+         (v2.x()*v3.y()-v2.y()*v3.x())>0
+         &&
+         (v3.y()-v1.y())*p.x()+
+         (v1.x()-v3.x())*p.y()+
+         (v3.x()*v1.y()-v3.y()*v1.x())>0){
+           //pushStyle();
+           //stroke(255, 255, 0);
+           //strokeWeight(1);
+           point(frame.coordinatesOf(p).x(), frame.coordinatesOf(p).y());
+           //println("in");
+      }
+    }
+  
+  }
   // frame.coordinatesOf converts from world to frame
   // here we convert v1 to illustrate the idea
+  /*
   if (debug) {
     pushStyle();
     stroke(255, 255, 0, 125);
     point(round(frame.coordinatesOf(v1).x()), round(frame.coordinatesOf(v1).y()));
     popStyle();
-  }
+  }*/
+  popStyle();
 }
 
 void randomizeTriangle() {
