@@ -5,7 +5,7 @@ import frames.processing.*;
 // 1. Frames' objects
 Scene scene;
 Frame frame;
-Vector v1, v2, v3, p;
+Vector v1, v2, v3, p, temp;
 // timing
 TimingTask spinningTask;
 boolean yDirection;
@@ -72,9 +72,9 @@ void draw() {
 // Coordinates are given in the frame system which has a dimension of 2^n
 void triangleRaster() {
   pushStyle();
-  //stroke(255, 255, 0);
-  
+  stroke(255, 255, 0);  
   strokeWeight(0.1);
+  
   for(int row=height/2; row>-height/2; row--){
     for(int col=-width/2; col<width/2; col++){
       p = new Vector(row, col);
@@ -89,26 +89,15 @@ void triangleRaster() {
          (v3.y()-v1.y())*p.x()+
          (v1.x()-v3.x())*p.y()+
          (v3.x()*v1.y()-v3.y()*v1.x())>0){
-           //pushStyle();
-           //stroke(255, 255, 0);
-           //strokeWeight(1);
+           
+           // frame.coordinatesOf converts from world to frame
            point(frame.coordinatesOf(p).x(), frame.coordinatesOf(p).y());
-           //println("in");
       }
-    }
-  
+    }  
   }
-  // frame.coordinatesOf converts from world to frame
-  // here we convert v1 to illustrate the idea
-  /*
-  if (debug) {
-    pushStyle();
-    stroke(255, 255, 0, 125);
-    point(round(frame.coordinatesOf(v1).x()), round(frame.coordinatesOf(v1).y()));
-    popStyle();
-  }*/
   popStyle();
 }
+
 
 void randomizeTriangle() {
   int low = -width/2;
@@ -116,6 +105,14 @@ void randomizeTriangle() {
   v1 = new Vector(random(low, high), random(low, high));
   v2 = new Vector(random(low, high), random(low, high));
   v3 = new Vector(random(low, high), random(low, high));
+  
+  if((v1.y()-v2.y())*v3.x()+
+     (v2.x()-v1.x())*v3.y()+
+     (v1.x()*v2.y()-v1.y()*v2.x())<=0){
+       temp = v1;
+       v1 = v3;
+       v3 = temp;
+     }
 }
 
 void drawTriangleHint() {
