@@ -82,7 +82,6 @@ void triangleRaster() {
   for(int i = - potencia; i <= potencia; i++){
     for(int j = - potencia; j <= potencia; j++){
       setColor(i, j, getIntensity(i, j));
-      //fill(200, 25, 2, getIntensity(i, j));
       rect(i, j, 1, 1);
     }
   }
