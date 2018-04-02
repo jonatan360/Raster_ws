@@ -36,13 +36,13 @@ Se implementó un algoritmo de antialiasing el cual divide un pixel en regiones 
 Se analizaron las siguientes técnicas:
 
 Anti Aliasing:
-    * UnderSampling
-    * MSAA
-    * Spatial AntiAliasing
+    - UnderSampling
+    - MSAA
+    - Spatial AntiAliasing
 
 Shading:
-    * Analytical shading
-    * Aspect-Based shading
+    - Analytical shading
+    - Aspect-Based shading
 
      
 Hubo dificultades al implementar las coordenadas baricentricas y para elegir el método mas adecuado de antialising.git
