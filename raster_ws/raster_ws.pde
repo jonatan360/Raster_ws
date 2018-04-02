@@ -12,6 +12,9 @@ boolean yDirection;
 // scaling is a power of 2
 int n = 4;
 
+// Antialiasing
+int antialiasing = 2;
+
 // 2. Hints
 boolean triangleHint = true;
 boolean gridHint = true;
@@ -72,32 +75,55 @@ void draw() {
 // Coordinates are given in the frame system which has a dimension of 2^n
 void triangleRaster() {
   pushStyle();
-  stroke(255, 255, 0);  
-  strokeWeight(0.1);
+  noStroke();
+  fill(255, 255, 0, 125);
   
-  for(int row=height/2; row>-height/2; row--){
-    for(int col=-width/2; col<width/2; col++){
-      p = new Vector(row, col);
-      if((v1.y()-v2.y())*p.x()+
-         (v2.x()-v1.x())*p.y()+
-         (v1.x()*v2.y()-v1.y()*v2.x())>0
-         &&
-         (v2.y()-v3.y())*p.x()+
-         (v3.x()-v2.x())*p.y()+
-         (v2.x()*v3.y()-v2.y()*v3.x())>0
-         &&
-         (v3.y()-v1.y())*p.x()+
-         (v1.x()-v3.x())*p.y()+
-         (v3.x()*v1.y()-v3.y()*v1.x())>0){
-           
-           // frame.coordinatesOf converts from world to frame
-           point(frame.coordinatesOf(p).x(), frame.coordinatesOf(p).y());
-      }
-    }  
+  int potencia = (int)Math.pow(2, n-1);
+  for(int i = - potencia; i <= potencia; i++){
+    for(int j = - potencia; j <= potencia; j++){
+      setColor(i, j, getIntensity(i, j));
+      //fill(200, 25, 2, getIntensity(i, j));
+      rect(i, j, 1, 1);
+    }
   }
   popStyle();
 }
 
+
+int getIntensity(int a, int b) {
+  float pixel_witdh = 1/(antialiasing * 1.0);
+  int inside = 0;
+  for(int i = 0; i < antialiasing ; i++){
+    for(int j = 0; j < antialiasing ; j++){
+      float x_a = a + pixel_witdh * i;
+      float y_a = b + pixel_witdh * j;
+      if( insideT(x_a, y_a) ) {
+        inside += 1;
+      }
+    }
+  }
+  
+  int intensity = Math.round(255*(inside/(1.0 * antialiasing * antialiasing)));
+  return intensity;
+}
+
+void setColor(float x , float y, int intensity) {
+  float v1_x = frame.coordinatesOf(v1).x();
+  float v2_x = frame.coordinatesOf(v2).x();
+  float v3_x = frame.coordinatesOf(v3).x();
+  
+  float v1_y = frame.coordinatesOf(v1).y(); 
+  float v2_y = frame.coordinatesOf(v2).y();  
+  float v3_y = frame.coordinatesOf(v3).y();
+   
+  float t1 = abs(((v2_x - v1_x) * (y - v1_y)) - ((x - v1_x) * (v2_y - v1_y)));
+  float t2 = abs(((v3_x - v2_x) * (y - v2_y)) - ((x - v2_x) * (v3_y - v2_y)));
+  float t3 = abs(((v1_x - v3_x) * (y - v3_y)) - ((x - v3_x) * (v1_y - v3_y)));
+      
+  
+  float m = t1+t2+t3/ (antialiasing * antialiasing);  
+  fill(255*(t1/m), 255*(t2/m), 255*(t3/m), intensity);
+}
 
 void randomizeTriangle() {
   int low = -width/2;
@@ -112,7 +138,22 @@ void randomizeTriangle() {
        temp = v1;
        v1 = v3;
        v3 = temp;
-     }
+  }
+}
+
+boolean insideT(float x , float y) {
+  float v1_x = frame.coordinatesOf(v1).x();
+  float v2_x = frame.coordinatesOf(v2).x();
+  float v3_x = frame.coordinatesOf(v3).x();
+  
+  float v1_y = frame.coordinatesOf(v1).y(); 
+  float v2_y = frame.coordinatesOf(v2).y();    
+  float v3_y = frame.coordinatesOf(v3).y();
+         
+  float t1 = ((v2_x - v1_x) * (y - v1_y)) - ((x - v1_x) * (v2_y - v1_y));
+  float t2 = ((v3_x - v2_x) * (y - v2_y)) - ((x - v2_x) * (v3_y - v2_y));
+  float t3 = ((v1_x - v3_x) * (y - v3_y)) - ((x - v3_x) * (v1_y - v3_y));
+  return (t2>0 && t3>0 && t1>0);
 }
 
 void drawTriangleHint() {
